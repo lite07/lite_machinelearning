@@ -1,0 +1,11 @@
+/*CSS file for the SOM Example HTML layout*/
+.canvasStyle1{
+	height:500px;
+	width:500px;
+	border:10px solid powderblue;
+	margin-left:25%;
+}
+
+.buttonStyle1{
+	margin-left:25%;
+}
