@@ -1,3 +1,18 @@
+/*
+K-Means Subprogram (Created: 10-04-18)
+Contains the procedure used in the K-Means Algorithm
+Function List:
+-createPoints
+-clusterAssignment
+-centroidCalculation
+-kMeansRoutine
+-ouputDataCluster
+
+Zaky Yudha Rabbani
+20217322
+Physics Department, Institut Teknologi Bandung, Indonesia
+Last Modified: 11-04-18
+*/
 #ifndef _KMEANSH_
 #define _KMEANSH_
 
@@ -6,7 +21,9 @@
 #include <stdlib.h> 
 #include <time.h> 	
 #include <stdio.h> 	
+#include <fstream>
 
+//Create N-random points between -5 and 5
 std::vector<Points> createPoints(int numberOfPoints)
 {
 	srand(time(NULL));
@@ -23,6 +40,7 @@ std::vector<Points> createPoints(int numberOfPoints)
 	return vectorOfPoints;
 }
 
+//Assign a data points to the nearest weight point
 void clusterAssignment(Points &A, std::vector<Points> weightPoints)
 {
 	double p2wDistance = Points::pointsDistance(A,weightPoints[0]);
@@ -39,6 +57,7 @@ void clusterAssignment(Points &A, std::vector<Points> weightPoints)
 	}
 }
 
+//Calculate the new weight points coordinates based on the number of data points that are in the same group
 void centroidCalculation(std::vector<Points> dataPoints, std::vector<Points> &weightPoints)
 {
 	double numberOfData = dataPoints.size();
@@ -74,7 +93,6 @@ void centroidCalculation(std::vector<Points> dataPoints, std::vector<Points> &we
 			{
 				new_x += clusterGroup[i][j].x;
 				new_y += clusterGroup[i][j].y;	
-				//std::cout << new_x << "\t" << new_y << "\n";	
 			}
 			new_x = new_x/clusterGroup[i].size();
 			new_y = new_y/clusterGroup[i].size();
@@ -85,10 +103,12 @@ void centroidCalculation(std::vector<Points> dataPoints, std::vector<Points> &we
 	
 }
 
+
+//The main K-Means Algorithm procedure
 void kMeansRoutine(std::vector<Points> &dataPoints, std::vector<Points> &weightPoints)
 {
-	double numberOfData = dataPoints.size();
 	double numberOfCluster = weightPoints.size();
+	double numberOfData = dataPoints.size();
 	int epoch = 0;
 	while(epoch<10)
 	{
@@ -98,12 +118,39 @@ void kMeansRoutine(std::vector<Points> &dataPoints, std::vector<Points> &weightP
 			clusterAssignment(dataPoints[i], weightPoints);
 		}
 		centroidCalculation(dataPoints,weightPoints);
-		for(int i = 0; i<2; i++)
+		for(int i = 0; i<numberOfCluster; i++)
 		{
 			weightPoints[i].group = i;
-			std::cout << weightPoints[i].x << "\t" << weightPoints[i].y << "\n";
 		}
 	}
+	
+	for(int i = 0; i<numberOfData; i++)
+	{
+		clusterAssignment(dataPoints[i], weightPoints);
+	}
+}
+
+//Outputs the grouped data into a txt file
+void outputDataCluster(std::vector<Points> dataPoints, std::vector<Points> weightPoints)
+{
+	double numberOfCluster = weightPoints.size();
+	double numberOfData = dataPoints.size();
+	
+	std::ofstream ofile;
+	ofile.open("clusteredData.txt");	
+	
+	for(int i = 0; i<numberOfCluster; i++)
+	{
+		ofile << "Cluster-" << i+1 << ":\n";
+		for(int j=0; j<numberOfData; j++)
+		{
+			if(dataPoints[j].group==weightPoints[i].group)
+			{
+				ofile << dataPoints[j].x << "\t\t" << dataPoints[j].y << "\n";
+			}
+		}
+	}
+	ofile.close();
 }
 
 #endif
